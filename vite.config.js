@@ -4,10 +4,9 @@ import { fileURLToPath, URL } from 'url'
 
 export default defineConfig({
   plugins: [react()],
-  base: './',
+  base: '/',
   build: {
     outDir: 'dist',
-    emptyOutDir: true,
     rollupOptions: {
       input: {
         main: fileURLToPath(new URL('./index.html', import.meta.url))
@@ -16,7 +15,8 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    historyApiFallback: true
   },
   resolve: {
     alias: {
