@@ -1,69 +1,91 @@
-// src/components/Navbar.jsx
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+// Navbar.jsx
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import './Navbar.css';
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
+  const [click, setClick] = useState(false);
+  const [button, setButton] = useState(true);
 
-  // Close mobile menu when route changes
+  const handleClick = () => setClick(!click);
+  const closeMobileMenu = () => setClick(false);
+
+  const showButton = () => {
+    if (window.innerWidth <= 960) {
+      setButton(false);
+    } else {
+      setButton(true);
+    }
+  };
+
   useEffect(() => {
-    setIsOpen(false);
-  }, [location]);
+    showButton();
+    window.addEventListener('resize', showButton);
+    return () => {
+      window.removeEventListener('resize', showButton);
+    };
+  }, []);
 
   return (
     <nav className="navbar">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold">
+      <div className="navbar-container">
+        <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
           MarketPlus
         </Link>
         
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex space-x-6">
-          <Link to="/dashboard" className="hover:text-blue-600">Dashboard</Link>
-          <Link to="/market-data" className="hover:text-blue-600">Market Data</Link>
-          <Link to="/insights" className="hover:text-blue-600">Insights</Link>
-          {user?.isAdmin && (
-            <Link to="/admin" className="hover:text-blue-600">Admin</Link>
+        <div className="menu-icon" onClick={handleClick}>
+          <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
+        </div>
+        
+        <ul className={click ? 'nav-menu active' : 'nav-menu'}>
+          <li className="nav-item">
+            <Link to="/" className="nav-links" onClick={closeMobileMenu}>
+              Home
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/market-data" className="nav-links" onClick={closeMobileMenu}>
+              Market Data
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/insights" className="nav-links" onClick={closeMobileMenu}>
+              Insights
+            </Link>
+          </li>
+          {isAdmin && (
+            <li className="nav-item">
+              <Link to="/admin" className="nav-links" onClick={closeMobileMenu}>
+                Admin
+              </Link>
+            </li>
           )}
-        </div>
-
-        {/* Mobile menu button */}
-        <div className="md:hidden">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="text-gray-700 hover:text-blue-600"
-          >
-            {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-          </button>
-        </div>
-
-        {/* Mobile menu */}
-        {isOpen && (
-          <div className="md:hidden absolute top-16 left-0 right-0 bg-white shadow-lg py-2">
-            <Link to="/dashboard" className="block px-4 py-2 hover:bg-gray-100">Dashboard</Link>
-            <Link to="/market-data" className="block px-4 py-2 hover:bg-gray-100">Market Data</Link>
-            <Link to="/insights" className="block px-4 py-2 hover:bg-gray-100">Insights</Link>
-            {user?.isAdmin && (
-              <Link to="/admin" className="block px-4 py-2 hover:bg-gray-100">Admin</Link>
-            )}
-            {user ? (
-              <button
-                onClick={signOut}
-                className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+          {user ? (
+            <li className="nav-item">
+              <button 
+                onClick={() => {
+                  signOut();
+                  closeMobileMenu();
+                }} 
+                className="sign-out-btn"
               >
                 Sign Out
               </button>
-            ) : (
-              <Link to="/login" className="block px-4 py-2 text-blue-600 hover:bg-gray-100">
+            </li>
+          ) : (
+            <li className="nav-item">
+              <Link 
+                to="/login" 
+                className="sign-in-btn" 
+                onClick={closeMobileMenu}
+              >
                 Sign In
               </Link>
-            )}
-          </div>
-        )}
+            </li>
+          )}
+        </ul>
       </div>
     </nav>
   );
