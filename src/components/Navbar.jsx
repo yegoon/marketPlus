@@ -1,32 +1,36 @@
-// Navbar.jsx
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { FaBars, FaTimes } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
   const { user, isAdmin, signOut } = useAuth();
-  const [click, setClick] = useState(false);
-  const [button, setButton] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
-  const handleClick = () => setClick(!click);
-  const closeMobileMenu = () => setClick(false);
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsOpen(false);
+    document.body.classList.remove('menu-open');
+  }, [location]);
 
-  const showButton = () => {
-    if (window.innerWidth <= 960) {
-      setButton(false);
+  // Toggle mobile menu
+  const toggleMenu = () => {
+    const newState = !isOpen;
+    setIsOpen(newState);
+    if (newState) {
+      document.body.classList.add('menu-open');
     } else {
-      setButton(true);
+      document.body.classList.remove('menu-open');
     }
   };
 
-  useEffect(() => {
-    showButton();
-    window.addEventListener('resize', showButton);
-    return () => {
-      window.removeEventListener('resize', showButton);
-    };
-  }, []);
+  // Close mobile menu
+  const closeMobileMenu = () => {
+    setIsOpen(false);
+    document.body.classList.remove('menu-open');
+  };
 
   return (
     <nav className="navbar">
@@ -35,11 +39,11 @@ const Navbar = () => {
           MarketPlus
         </Link>
         
-        <div className="menu-icon" onClick={handleClick}>
-          <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
+        <div className="menu-icon" onClick={toggleMenu}>
+          {isOpen ? <FaTimes /> : <FaBars />}
         </div>
         
-        <ul className={click ? 'nav-menu active' : 'nav-menu'}>
+        <ul className={`nav-menu ${isOpen ? 'active' : ''}`}>
           <li className="nav-item">
             <Link to="/" className="nav-links" onClick={closeMobileMenu}>
               Home

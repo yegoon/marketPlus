@@ -820,3 +820,23 @@
   background-color: #fef2f2;
   color: #ef4444;
 }
+/* Dashboard.css */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  padding-top: 100px; /* Add padding to account for fixed navbar */
+}
+
+/* Add this to prevent horizontal scroll on mobile */
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Ensure content doesn't get hidden behind navbar */
+@media screen and (max-width: 960px) {
+  .dashboard-container {
+    padding-top: 80px; /* Adjust based on your navbar height */
+  }
+}
